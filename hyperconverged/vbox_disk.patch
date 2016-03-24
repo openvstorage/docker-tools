@@ -1,0 +1,20 @@
+--- /opt/OpenvStorage/ovs/lib/disk.py.org	2016-03-18 09:47:00.882569952 +0000
++++ /opt/OpenvStorage/ovs/lib/disk.py	2016-03-18 09:47:17.410569161 +0000
+@@ -87,7 +87,7 @@
+                 context = remote.Context()
+                 devices = [device for device in context.list_devices(subsystem='block')
+                            if ('ID_TYPE' in device and device['ID_TYPE'] == 'disk') or
+-                              ('DEVNAME' in device and ('loop' in device['DEVNAME'] or 'nvme' in device['DEVNAME'] or 'md' in device['DEVNAME']))]
++                              ('DEVNAME' in device and ('loop' in device['DEVNAME'] or 'nvme' in device['DEVNAME'] or 'sd' in device['DEVNAME']))]
+                 for device in devices:
+                     is_partition = device['DEVTYPE'] == 'partition'
+                     device_path = device['DEVNAME']
+@@ -149,7 +149,7 @@
+                             partitions_info = DiskTools.get_partitions_info(match.groups()[0])
+                             if device_path in partitions_info:
+                                 partition_info = partitions_info[device_path]
+-                                offset = int(partition_info['offset'])
++                                offset = 0 ##int(partition_info['offset'])
+                                 size = int(partition_info['size'])
+                             else:
+                                 logger.warning('Could not retrieve partition info for disk/partition {0}'.format(device_path))

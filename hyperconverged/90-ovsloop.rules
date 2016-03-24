@@ -1,0 +1,9 @@
+SUBSYSTEM!="block", GOTO="ovsloop_end"
+
+KERNEL=="loop[0-9]", SYMLINK+="vd-%k", RUN+="/bin/ln -s ../../vd-%k /dev/disk/by-id/virtio-%k"
+KERNEL=="loop*p[0-9]", SYMLINK+="vd-%k", RUN+="/bin/ln -s ../../vd-%k /dev/disk/by-id/virtio-%P-part%n"
+
+## SYMLINK=="vd-loop*", RUN="/bin/mkdir -p /dev/disk/by-id; /bin/ln -s ../../vd-%k /dev/disk/by-id/virtio-%k"
+
+LABEL="ovsloop_end"
+

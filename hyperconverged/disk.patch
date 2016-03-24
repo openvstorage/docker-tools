@@ -1,0 +1,11 @@
+--- /opt/OpenvStorage/ovs/lib/disk.py.org	2016-03-15 16:32:10.625412497 +0000
++++ /opt/OpenvStorage/ovs/lib/disk.py	2016-03-15 16:00:03.000000000 +0000
+@@ -67,6 +67,8 @@
+                 match = re.search('(/dev/(.+?)) on (/.*?) type.*', mount)
+                 if match is not None:
+                     dev_name = match.groups()[0]
++                    if 'dm-0' in dev_name:
++                        continue
+                     uuid = client.run('blkid -o value -s UUID {0}'.format(dev_name))
+                     if uuid:
+                         mount_mapping[uuid] = match.groups()[2]

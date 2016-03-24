@@ -1,0 +1,38 @@
+--- /opt/OpenvStorage/ovs/lib/storagerouter.py.org	2016-03-21 13:38:58.107377937 +0000
++++ /opt/OpenvStorage/ovs/lib/storagerouter.py	2016-03-21 13:40:01.271377530 +0000
+@@ -618,7 +618,7 @@
+         storagedriver.vpool = vpool
+         storagedriver.cluster_ip = grid_ip
+         storagedriver.storage_ip = '127.0.0.1' if storagerouter.pmachine.hvtype == 'KVM' else storage_ip
+-        storagedriver.mountpoint = '/mnt/{0}'.format(vpool_name)
++        storagedriver.mountpoint = '/exports/{0}'.format(vpool_name)
+         storagedriver.mountpoint_dfs = local_backend_data.get('local_connection_path')
+         storagedriver.description = storagedriver.name
+         storagedriver.storagerouter = storagerouter
+@@ -810,7 +810,7 @@
+             for template in ['ganesha-core', 'ganesha-export']:
+                 contents += client.file_read('/opt/OpenvStorage/config/templates/{0}.conf'.format(template))
+             params = {'VPOOL_NAME': vpool_name,
+-                      'VPOOL_MOUNTPOINT': '/mnt/{0}'.format(vpool_name),
++                      'VPOOL_MOUNTPOINT': '/exports/{0}'.format(vpool_name),
+                       'CONFIG_PATH': storagedriver_config.remote_path,
+                       'NFS_FILESYSTEM_ID': storagerouter.ip.split('.', 2)[-1]}
+             for key, value in params.iteritems():
+@@ -1014,7 +1014,7 @@
+             client.update_cluster_node_configs(str(current_storagedriver.storagedriver_id))
+ 
+         # Fill vPool size
+-        vfs_info = os.statvfs('/mnt/{0}'.format(vpool_name))
++        vfs_info = os.statvfs('/exports/{0}'.format(vpool_name))
+         vpool.size = vfs_info.f_blocks * vfs_info.f_bsize
+         vpool.status = VPool.STATUSES.RUNNING
+         vpool.save()
+@@ -1529,7 +1529,7 @@
+         Checks whether a given mountpoint for vPool is in use
+         :param name: Name of the mountpoint to check
+         """
+-        mountpoint = '/mnt/{0}'.format(name)
++        mountpoint = '/exports/{0}'.format(name)
+         if not os.path.exists(mountpoint):
+             return True
+         return check_output('sudo -s ls -al {0} | wc -l'.format(mountpoint), shell=True).strip() == '3'

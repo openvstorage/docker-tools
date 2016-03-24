@@ -1,0 +1,25 @@
+[setup]
+; join_cluster False for 1st node; True for others
+join_cluster = __JOIN_CLUSTER__
+; master_ip is the IP of the 1st node 
+master_ip = __MASTER_IP__
+; target_ip & cluster_ip are local IP from this node
+target_ip = __NODE_IP__
+cluster_ip = __NODE_IP__
+; this password is set in via Dockerfile; keep them in sync!
+target_password = ovsrooter
+cluster_name = dockey
+; we need to set hypervisor params but these are unused
+hypervisor_type = KVM
+hypervisor_name = __OVS_HOST__
+hypervisor_username = unknown
+hypervisor_password = notsosiekret
+hypervisor_ip = 127.0.0.1
+;
+configure_memcached = True
+configure_rabbitmq = True
+
+[asdmanager]
+; api_ip is local IP of this node
+api_ip = __NODE_IP__
+asd_ips = [ "__NODE_IP__" ]
