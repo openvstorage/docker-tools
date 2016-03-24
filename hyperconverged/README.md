@@ -47,3 +47,7 @@ This will give you a bash shell inside the second running container/node. Do not
 
 From a browser, access **https://\<IP_OF_THE_FIRST_HOST\>** to open the GUI. 
 Created vpools will be available on /mnt/ovs/\<vpool_name\> on the hosts (outside the container).
+
+# Cleaning up
+
+Simply exit the bash shells in the containers and the whole setup will be discarded.
