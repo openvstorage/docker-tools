@@ -43,7 +43,7 @@ weave launch --ipalloc-range 10.250.0.0/16 <IP_OF_FIRST_HOST>
 ```
 ./ovscluster.sh join ovshc2 10.250.0.2/16
 ```
-This will give you a bash shell inside the first running container/node. Do not exit this, as this will remove the setup!
+This will give you a bash shell inside the second running container/node. Do not exit this, as this will remove the setup!
 
 From a browser, access **https://\<IP_OF_THE_FIRST_HOST\>** to open the GUI. 
 Created vpools will be available on /mnt/ovs/\<vpool_name\> on the hosts (outside the container).
