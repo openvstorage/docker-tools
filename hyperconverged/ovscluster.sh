@@ -29,6 +29,42 @@ then
   JOIN_CLUSTER="False"
 fi
 
+############################################################################################
+
+create_preconfig()
+{
+cat >openvstorage_preconfig.cfg <<__EOF__
+[setup]
+; join_cluster False for 1st node; True for others
+join_cluster = ${JOIN_CLUSTER}
+; master_ip is the IP of the 1st node 
+master_ip = ${MASTER_IP}
+; target_ip & cluster_ip are local IP from this node
+target_ip = ${NODE_IP}
+cluster_ip = ${NODE_IP}
+; this password is set in via Dockerfile; keep them in sync!
+target_password = ovsrooter
+cluster_name = dockey
+; we need to set hypervisor params but these are unused
+hypervisor_type = KVM
+hypervisor_name = ${OVS_HOST}
+hypervisor_username = unknown
+hypervisor_password = notsosiekret
+hypervisor_ip = 127.0.0.1
+;
+configure_memcached = True
+configure_rabbitmq = True
+
+[asdmanager]
+; api_ip is local IP of this node
+api_ip = ${NODE_IP}
+asd_ips = [ "${NODE_IP}" ]
+__EOF__
+}
+
+############################################################################################
+############################################################################################
+
 eval "$(weave env)"
 
 sudo mount --make-shared /
@@ -60,11 +96,7 @@ then
    echo "MASTER_IP set to ${MASTER_IP}"
 fi
 
-sed -e "s/__NODE_IP__/${NODE_IP}/g" \
-    -e "s/__MASTER_IP__/${MASTER_IP}/g" \
-    -e "s/__JOIN_CLUSTER__/${JOIN_CLUSTER}/g" \
-    -e "s/__OVS_HOST__/${OVS_HOST}/g" \
-    openvstorage_preconfig.template >openvstorage_preconfig.cfg
+create_preconfig
 docker cp openvstorage_preconfig.cfg "${OVS_HOST}":/tmp
 docker exec -it ${OVS_HOST} pkill memcached
 docker exec -it ${OVS_HOST} ovs setup
