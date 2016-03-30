@@ -5,7 +5,7 @@ will also be saved as ovshc_unstable_img.tar.gz to allow re-use on other hosts.
 
 A version is available via https://github.com/openvstorage/docker-tools/releases/download/20160325/ovshc_unstable_img.tar.gz
 
-To load it on a docker host:
+To load it on a docker host (assuming you have docker already installed):
 ```
 gzip -dc ovshc_unstable_img.tar.gz | docker load
 ```
@@ -13,6 +13,8 @@ gzip -dc ovshc_unstable_img.tar.gz | docker load
 Of course, we also plan to publish this image to allow docker to pull it automatically for you.
 
 # Using the image
+
+(tip: more detailed info in the wiki on https://github.com/openvstorage/docker-tools/wiki/Taking-the-dockerised-hyperconverged-setup-for-a-testrun)
 
 First download _weave_ to enable networking between docker containers running on different hosts.
 ```
