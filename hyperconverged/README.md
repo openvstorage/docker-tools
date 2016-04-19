@@ -10,8 +10,6 @@ To load it on a docker host (assuming you have docker already installed):
 docker pull docker.openvstorage.org/ovshc/unstable
 ```
 
-Of course, we also plan to publish this image to allow docker to pull it automatically for you.
-
 # Using the image
 
 (tip: more detailed info in the wiki on https://github.com/openvstorage/docker-tools/wiki/Taking-the-dockerised-hyperconverged-setup-for-a-testrun)
