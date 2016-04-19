@@ -3,11 +3,11 @@
 Use the _build_image.sh_ script to create a fresh ovshc/unstable image (using the unstable openvstorage repo). This image
 will also be saved as ovshc_unstable_img.tar.gz to allow re-use on other hosts.
 
-A version is available via https://github.com/openvstorage/docker-tools/releases/download/20160325/ovshc_unstable_img.tar.gz
+A version is available via our Docker registry at docker.openvstorage.org:
 
 To load it on a docker host (assuming you have docker already installed):
 ```
-gzip -dc ovshc_unstable_img.tar.gz | docker load
+docker pull docker.openvstorage.org/ovshc/unstable
 ```
 
 Of course, we also plan to publish this image to allow docker to pull it automatically for you.
