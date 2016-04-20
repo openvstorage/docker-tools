@@ -53,13 +53,12 @@ ADD networking.conf /etc/init/
 
 ## VARIOUS FIXES TO THE OVS PACKAGES
 ADD *.patch /tmp/
-RUN cd /; patch -p0 </tmp/disk.patch; patch -p0 </tmp/vbox_disk.patch; \
-    sed -i 's/-B 1M/-B 1/g' /opt/OpenvStorage/ovs/lib/storagerouter.py; \
+RUN cd /; echo "+++ patch -p0 </tmp/disk.patch +++"; patch -p0 </tmp/disk.patch; \
+    echo "+++ patch -p0 </tmp/vbox_disk.patch +++"; patch -p0 </tmp/vbox_disk.patch; \
     sed -i "/^ALLOWED_HOSTS/s/\]/,'*'\]/" /opt/OpenvStorage/webapps/api/settings.py; \
     sed -i '/^disk:/s/:$/:ovs/' /etc/group; \
-    mkdir /exports; patch -p0 </tmp/exports.patch; \
-    patch -p0 </tmp/backend_refresh.patch; \
-    patch -p0 </tmp/setup_rabbitmq_hostname.patch; \
+    mkdir /exports; echo "+++ patch -p0 </tmp/exports.patch +++"; patch -p0 </tmp/exports.patch; \
+    echo "+++ patch -p0 </tmp/heartbeat_hostname.patch +++"; patch -p0 </tmp/heartbeat_hostname.patch; \
     rm /tmp/*.patch
 
 ## MAKE SURE SSH WORKS FOR ROOT

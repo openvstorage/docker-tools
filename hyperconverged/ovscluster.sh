@@ -33,32 +33,22 @@ fi
 
 create_preconfig()
 {
-cat >openvstorage_preconfig.cfg <<__EOF__
-[setup]
-; join_cluster False for 1st node; True for others
-join_cluster = ${JOIN_CLUSTER}
-; master_ip is the IP of the 1st node 
-master_ip = ${MASTER_IP}
-; target_ip & cluster_ip are local IP from this node
-target_ip = ${NODE_IP}
-cluster_ip = ${NODE_IP}
-; this password is set in via Dockerfile; keep them in sync!
-target_password = ovsrooter
-cluster_name = dockey
-; we need to set hypervisor params but these are unused
-hypervisor_type = KVM
-hypervisor_name = ${OVS_HOST}
-hypervisor_username = unknown
-hypervisor_password = notsosiekret
-hypervisor_ip = 127.0.0.1
-;
-configure_memcached = True
-configure_rabbitmq = True
-
-[asdmanager]
-; api_ip is local IP of this node
-api_ip = ${NODE_IP}
-asd_ips = [ "${NODE_IP}" ]
+cat >openvstorage_preconfig.json <<__EOF__
+{
+ "setup":
+    {
+        "master_ip": "${MASTER_IP}",
+        "master_password": "ovsrooter",
+        "cluster_ip": "${NODE_IP}",
+        "hypervisor_name": "${OVS_HOST}",
+        "hypervisor_type": "KVM"
+    },
+ "asdmanager":
+    {
+        "api_ip": "${NODE_IP}",
+        "asd_ips": [ "${NODE_IP}" ]
+    }
+}
 __EOF__
 }
 
@@ -76,7 +66,7 @@ sudo mkdir -p ${POOL_ROOT}
 docker run -d -p 443:443 -e WEAVE_CIDR="${WEAVE_CIDR}" --name "${OVS_HOST}" \
               --privileged --cap-drop=ALL --cap-add=SYS_ADMIN --cap-add=MKNOD \
               -v /dev:/dev/:ro \
-              -v ${POOL_ROOT}:/exports:shared ovshc/unstable
+              -v ${POOL_ROOT}:/exports:shared docker.openvstorage.org/ovshc/unstable
 
 if [ "${JOIN_CLUSTER}" == "True" ]
 then
@@ -87,17 +77,22 @@ then
      sleep 1
      docker exec "${OVS_HOST}" avahi-daemon --check
    done
-   MASTER_IP=$(docker exec "${OVS_HOST}" avahi-browse -atlpf | awk -F ';' '/ovs_cluster_dockey_/ { n=split($4, i, "_"); print i[n-3]"."i[n-2]"."i[n-1]"."i[n]; exit }')
+   MASTER_IP=$(docker exec "${OVS_HOST}" avahi-browse -atlpf | awk -F ';' '/ovs_cluster_preconfig-/ { n=split($4, i, "_"); print i[n-3]"."i[n-2]"."i[n-1]"."i[n]; exit }')
    while [ -z "${MASTER_IP}" ]
    do
      sleep 1
-     MASTER_IP=$(docker exec "${OVS_HOST}" avahi-browse -atlpf | awk -F ';' '/ovs_cluster_dockey_/ { n=split($4, i, "_"); print i[n-3]"."i[n-2]"."i[n-1]"."i[n]; exit }')
+     MASTER_IP=$(docker exec "${OVS_HOST}" avahi-browse -atlpf | awk -F ';' '/ovs_cluster_preconfig-/ { n=split($4, i, "_"); print i[n-3]"."i[n-2]"."i[n-1]"."i[n]; exit }')
    done
    echo "MASTER_IP set to ${MASTER_IP}"
 fi
 
+## create new /etc/openvstorage_id
+## (normally done in openvstorage-core.preinst package; so already installed in the docker image
+##  and thus the same on all nodes which should not be)
+docker exec -it ${OVS_HOST} /bin/bash -c 'openssl rand -base64 64 | tr -dc A-Z-a-z-0-9 | head -c 16 >/etc/openvstorage_id'
+
 create_preconfig
-docker cp openvstorage_preconfig.cfg "${OVS_HOST}":/tmp
+docker cp openvstorage_preconfig.json "${OVS_HOST}":/opt/OpenvStorage/config/
 docker exec -it ${OVS_HOST} pkill memcached
 docker exec -it ${OVS_HOST} ovs setup
 docker exec -it ${OVS_HOST} /bin/bash
