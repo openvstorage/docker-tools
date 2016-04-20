@@ -51,3 +51,7 @@ Created vpools will be available on /mnt/ovs/\<vpool_name\> on the hosts (outsid
 # Cleaning up
 
 Simply exit the bash shells in the containers and the whole setup will be discarded.
+To stop weave, do
+```
+weave stop-plugin && weave reset
+```
