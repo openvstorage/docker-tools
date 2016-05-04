@@ -78,14 +78,10 @@ docker exec -it ${OVS_HOST} /bin/bash -c 'openssl rand -base64 64 | tr -dc A-Z-a
 create_preconfig
 docker cp openvstorage_preconfig.json "${OVS_HOST}":/opt/OpenvStorage/config/
 docker exec -it ${OVS_HOST} pkill memcached
-#docker exec -it ${OVS_HOST} service nginx start
-#docker exec -it ${OVS_HOST} ovs setup
-docker exec -it ${OVS_HOST} /bin/bash
+docker exec -it ${OVS_HOST} ovs setup
+docker exec -it ${OVS_HOST} /bin/bash -l
  
 docker exec -it ${OVS_HOST} halt -p
-#docker kill --signal=9 ${OVS_HOST}
-#docker wait ${OVS_HOST}
-docker stop --time=30 ${OVS_HOST} ## & sleep 120
-#docker stop ${OVS_HOST}
+docker stop --time=30 ${OVS_HOST} 
 docker rm ${OVS_HOST}
 
