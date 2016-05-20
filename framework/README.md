@@ -14,7 +14,7 @@ On second node:
 
 WORKING:
 - GUI 
-- all required services run inside the container
+- all required services (etcd/memcache/nginx/rabbitmq/celery/...) run inside the container
 
 NOT WORKING:
 - access to etcd inside the container from external hosts
