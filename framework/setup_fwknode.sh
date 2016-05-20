@@ -52,11 +52,15 @@ __EOF__
 
 eval "$(weave env)"
 
+# uncomment next line if you want to rebuild the image before starting
+# docker build --no-cache -t ovshc/unstable .
+
 ## start-stop-daemon wants to read certain /proc info which requires SYS_PTRACE capabilities!
 ## (cfr. http://blog.deliverous.com/2015-01-03.start-stop-daemon.html)
-docker run -d -p 443:443 -e WEAVE_CIDR="${WEAVE_CIDR}" --name "${OVS_HOST}" \
-           --cap-add SYS_PTRACE \
+docker run -d -e WEAVE_CIDR="${WEAVE_CIDR}" --name "${OVS_HOST}" \
+           -p 443:443 \
            -v /dev:/dev/:ro \
+           --cap-add SYS_PTRACE \
            framework
 if [ $? -ne 0 ]
 then
@@ -75,7 +79,7 @@ docker cp openvstorage_preconfig.json "${OVS_HOST}":/opt/OpenvStorage/config/
 docker exec -it ${OVS_HOST} ovs setup
 docker exec -it ${OVS_HOST} /bin/bash -l
  
-docker exec -it ${OVS_HOST} halt -p
-docker stop --time=30 ${OVS_HOST} 
-docker rm ${OVS_HOST}
+#docker exec -it ${OVS_HOST} halt -p
+#docker stop --time=30 ${OVS_HOST}
+#docker rm ${OVS_HOST}
 
