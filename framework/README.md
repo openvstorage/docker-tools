@@ -19,5 +19,7 @@ WORKING:
 NOT WORKING:
 - access to etcd inside the container from external hosts; external hosts need access to weave network!
 
-     weave launch --ipalloc-range 10.250.0.0/24 <PUBLIC_IP_OF_FIRST_HOST>
-     ip a a 10.250.0.100/24 dev weave
+  ```
+  weave launch --ipalloc-range 10.250.0.0/24 <PUBLIC_IP_OF_FIRST_HOST>
+  ip a a 10.250.0.100/24 dev weave
+  ```
