@@ -1,0 +1,44 @@
+FROM docker.openvstorage.org/ububase/14.04.4
+
+ENV DEBIAN_FRONTEND noninteractive
+ENV container docker
+ENV TERM xterm
+
+EXPOSE 443
+
+RUN \
+ # PREVENT STARTING SERVICES
+ \
+ mv /sbin/initctl /sbin/initctl.disabled && echo '#!/bin/sh\nexit 0' >/sbin/initctl \
+ && echo '#!/bin/sh\nexit 101' >/usr/sbin/policy-rc.d && chmod 555 /usr/sbin/policy-rc.d \
+ \
+ && echo "deb http://apt.openvstorage.org unstable main" > /etc/apt/sources.list.d/ovsaptrepo.list \
+ && apt-get update -qq \
+ && apt-get install -y --no-install-recommends openssl libvirt-bin omniorb-nameserver fuse avahi-daemon avahi-utils \
+ && apt-get install -y --no-install-recommends --allow-unauthenticated openvstorage \
+ && sed -i.org '/install_plugins():/a\        return' /opt/OpenvStorage/ovs/extensions/generic/plugins.py \
+ && apt-get install -y --no-install-recommends --allow-unauthenticated openvstorage-hc \
+ && mv /opt/OpenvStorage/ovs/extensions/generic/plugins.py.org /opt/OpenvStorage/ovs/extensions/generic/plugins.py \
+ && rm -rf /var/lib/apt/lists/* \
+ && update-rc.d -f gunicorn remove \
+ && update-rc.d -f nfs-kernel-server remove \
+ && strip /usr/bin/arakoon /usr/bin/alba /usr/lib/alba/* \
+ \
+ # ALLOW STARTING SERVICES
+ && rm /usr/sbin/policy-rc.d \
+ && mv /sbin/initctl.disabled /sbin/initctl
+
+## following line removes some packages that are pulled in but not needed; but that breaks dependencies
+## and, while making the docker image smaller it also prevents extra installs in the container
+## && dpkg --purge --force-depends python2.7-dev python-dev libexpat1-dev libc6-dev dpkg-dev libc-dev-bin linux-libc-dev
+
+## VARIOUS FIXES TO THE OVS PACKAGES
+# ADD *.patch /tmp/
+
+RUN cd /; \
+    sed -i "/^ALLOWED_HOSTS/s/\]/,'*'\]/" /opt/OpenvStorage/webapps/api/settings.py; \
+    sed -i '/^disk:/s/:$/:ovs/' /etc/group;
+
+WORKDIR /root
+
+CMD ["/sbin/init"]
