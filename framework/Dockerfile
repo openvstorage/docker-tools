@@ -26,8 +26,11 @@ RUN echo 'force-unsafe-io' > /etc/dpkg/dpkg.cfg.d/docker-apt-speedup \
  && rm -rf /var/lib/apt/lists/* \
  && update-rc.d -f gunicorn remove \
  && update-rc.d -f nfs-kernel-server remove \
- && strip /usr/bin/arakoon /usr/bin/alba /usr/lib/alba/* \
- && dpkg --purge --force-depends python2.7-dev python-dev libexpat1-dev libc6-dev dpkg-dev libc-dev-bin linux-libc-dev
+ && strip /usr/bin/arakoon /usr/bin/alba /usr/lib/alba/*
+
+## following line removes some packages that are pulled in but not needed; but that breaks dependencies
+## and, while making the docker image smaller it also prevents extra installs in the container
+## && dpkg --purge --force-depends python2.7-dev python-dev libexpat1-dev libc6-dev dpkg-dev libc-dev-bin linux-libc-dev
 
 ## ALLOW UPSTART TO WORK
 ## cfr https://github.com/tianon/dockerfiles/blob/master/sbin-init/ubuntu/upstart/14.04/Dockerfile
@@ -56,12 +59,11 @@ RUN rm /usr/sbin/policy-rc.d \
 ADD networking.conf /etc/init/
 
 ## VARIOUS FIXES TO THE OVS PACKAGES
-ADD *.patch /tmp/
+# ADD *.patch /tmp/
+
 RUN cd /; \
     sed -i "/^ALLOWED_HOSTS/s/\]/,'*'\]/" /opt/OpenvStorage/webapps/api/settings.py; \
-    sed -i '/^disk:/s/:$/:ovs/' /etc/group; \
-    echo "+++ patch -p0 </tmp/heartbeat_hostname.patch +++"; patch -p0 </tmp/heartbeat_hostname.patch; \
-    rm /tmp/*.patch
+    sed -i '/^disk:/s/:$/:ovs/' /etc/group;
 
 ## MAKE SURE SSH WORKS FOR ROOT
 RUN sed -i 's/^PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config; \
