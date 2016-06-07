@@ -23,3 +23,7 @@ NOT WORKING:
   weave launch --ipalloc-range 10.250.0.0/24 <PUBLIC_IP_OF_FIRST_HOST>
   ip a a 10.250.0.100/24 dev weave
   ```
+
+SEE ALSO
+
+For configuration of the other components see https://openvstorage.gitbooks.io/openvstorage/content/Installation/geoscalegettingstarted.html
