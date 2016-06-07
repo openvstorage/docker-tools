@@ -1,0 +1,11 @@
+--- /opt/OpenvStorage/ovs/extensions/generic/heartbeat.py.orig	2016-05-10 12:28:27.000000000 +0000
++++ /opt/OpenvStorage/ovs/extensions/generic/heartbeat.py	2016-05-10 12:32:21.128335542 +0000
+@@ -54,7 +54,7 @@
+         for node in routers:
+             if node.heartbeats is None:
+                 node.heartbeats = {}
+-            if 'celery@{0}: OK'.format(node.name) in worker_states:
++            if 'celery@{0}: OK'.format(check_output('hostname -f',shell=True).strip()) in worker_states:
+                 node.heartbeats['celery'] = current_time
+             if node.machine_id == machine_id:
+                 node.heartbeats['process'] = current_time
