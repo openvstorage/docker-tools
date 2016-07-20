@@ -14,8 +14,8 @@ RUN \
  \
  && echo "deb http://apt.openvstorage.org unstable main" > /etc/apt/sources.list.d/ovsaptrepo.list \
  && apt-get update -qq \
- && apt-get install -y --no-install-recommends openssl libvirt-bin omniorb-nameserver fuse avahi-daemon avahi-utils \
- && apt-get install -y --no-install-recommends --allow-unauthenticated openvstorage \
+ && apt-get install -y --no-install-recommends --allow-unauthenticated openssl libvirt-bin omniorb-nameserver fuse avahi-daemon avahi-utils \
+ && apt-get install -y --no-install-recommends --allow-unauthenticated volumedriver-no-dedup-server openvstorage \
  && sed -i.org '/install_plugins():/a\        return' /opt/OpenvStorage/ovs/extensions/generic/plugins.py \
  && apt-get install -y --no-install-recommends --allow-unauthenticated openvstorage-hc \
  && mv /opt/OpenvStorage/ovs/extensions/generic/plugins.py.org /opt/OpenvStorage/ovs/extensions/generic/plugins.py \
@@ -23,6 +23,10 @@ RUN \
  && update-rc.d -f gunicorn remove \
  && update-rc.d -f nfs-kernel-server remove \
  && strip /usr/bin/arakoon /usr/bin/alba /usr/lib/alba/* \
+ \
+ # prevent same openstorage_id from being reused
+ && rm /etc/openvstorage_id \
+ && sed -i '/^exit/iif [ ! -s \/etc\/openvstorage_id ]; then openssl rand -base64 64 | tr -dc A-Z-a-z-0-9 | head -c 16 >\/etc\/openvstorage_id; fi' /etc/rc.local \
  \
  # ALLOW STARTING SERVICES
  && rm /usr/sbin/policy-rc.d \
